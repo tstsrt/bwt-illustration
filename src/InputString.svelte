@@ -2,7 +2,6 @@
     import { createEventDispatcher } from "svelte";
     import Form from "./Form.svelte";
     import Icon from "@iconify/svelte";
-    import right_arrow from "@iconify/icons-gg/arrow-right";
     import dice from "@iconify/icons-gg/dice-5";
 
     const dispatch = createEventDispatcher();

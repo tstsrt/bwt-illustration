@@ -2,21 +2,19 @@
     export let base_string: string;
 
     import { flip } from "svelte/animate";
+    import {
+        Permutation,
+        make_permutations,
+        sort_lexicographically,
+        sort_by_index,
+    } from "./permutations";
     type Stages = "list_perms" | "sort_perms" | "hl_last_col";
     const all_stages: Stages[] = ["list_perms", "sort_perms", "hl_last_col"];
     let stage: Stages = "list_perms";
-    interface Permutation {
-        index: number;
-        permutation: string;
-    }
-    let perms: Permutation[] = new Array();
+    let perms: Permutation[] = [];
 
     function set_stage(new_stage: Stages) {
         stage = new_stage;
-    }
-
-    function clear_perms() {
-        perms = [];
     }
 
     function describe(stage: Stages): string {
@@ -31,41 +29,21 @@
     }
 
     $: if (base_string) {
-        clear_perms();
         set_stage("list_perms");
-        for (let i = 0; i < base_string.length; i++) {
-            let perm = base_string.slice(i) + base_string.slice(0, i);
-            perms.push({ index: i, permutation: perm });
-        }
-        perms = perms;
+        perms = make_permutations(base_string);
     }
     $: switch (stage) {
         case "list_perms":
-            perms.sort((p1, p2) => p1.index - p2.index);
-            perms = perms;
+            perms = sort_by_index(perms);
             break;
         case "sort_perms":
         case "hl_last_col":
-            perms.sort((p1, p2) => {
-                if (p1.permutation === p2.permutation) return 0;
-                return p1.permutation > p2.permutation ? 1 : -1;
-            });
-            perms = perms;
+            perms = sort_lexicographically(perms);
             break;
     }
 </script>
 
 <section>
-    <ul id="perms-list">
-        {#each perms as perm (perm.index)}
-            <li animate:flip={{ duration: 600 }}>
-                <span>{perm.permutation.slice(0, -1)}</span><span
-                    >{perm.permutation.at(-1)}</span
-                >
-            </li>
-        {/each}
-    </ul>
-
     <ul id="stages-list">
         {#each all_stages as const_stage}
             <li>
@@ -83,21 +61,33 @@
             </li>
         {/each}
     </ul>
-</section>
+    
+    <ul id="perms-list">
+        {#if base_string}
+            {#each perms as perm (perm.index)}
+                <li
+                    animate:flip={{ duration: 600 }}
+                    class:hl={stage === "hl_last_col"}
+                >
+                    <span>{perm.permutation.slice(0, -1)}</span><span
+                        >{perm.permutation.at(-1)}</span
+                    >
+                </li>
+            {/each}
+        {:else}
+            <li>No string defined</li>
+        {/if}
+    </ul>
 
-{#if stage === "hl_last_col"}
-    <style>
-        li > span:first-child {
-            opacity: 0.4;
-        }
-    </style>
-{/if}
+    <p>The permutations of the input string</p>
+</section>
 
 <style>
     section {
         display: flex;
         flex-flow: row wrap;
-        margin: 0;
+        justify-content: start;
+        margin: 1em 0;
         padding: 0;
     }
 
@@ -117,17 +107,26 @@
         transition: opacity 0.3s;
     }
 
+    li.hl > span:first-child {
+        opacity: 0.4;
+    }
+
+    li.hl > span:last-child {
+        font-weight: 700;
+    }
+
     input[type="radio"] {
         display: none;
     }
 
     input[type="radio"]:checked + label {
-        box-shadow: 0 0 4px #00000080;
+        color: var(--accent-color);
+        font-weight: 700;
     }
 
     input[type="radio"]:disabled + label {
-        box-shadow: none;
         color: #808080;
+        font-weight: 400;
     }
 
     #perms-list {
@@ -136,7 +135,7 @@
         flex: 1 1 auto;
         min-width: 4em;
         max-width: 20em;
-        margin-left: 1em;
+        margin: 1em auto;
     }
 
     #stages-list {
@@ -154,5 +153,15 @@
     #stages-list label {
         padding: 0.4em 1em;
         border-radius: 4px;
+    }
+
+    p {
+        width: 100%;
+        text-align: center;
+    }
+
+    p::before {
+        content: "Figure: ";
+        font-weight: 700;
     }
 </style>
