@@ -134,17 +134,73 @@
             and spend a lot of money to buy more RAM?
         </p>
         <p>
-            Fortunately, there's a way out of this conundrum. Suppose we store the
-            pre-computed ranks for only a few characters - say every Δ characters in
-            the BWT. Then, to calculate the rank of any character <code>c</code>, we
-            only need to walk to <code>c</code> from the nearest "checkpoint" at which
-            we pre-computed the rank, counting other <code>c</code>'s along the way.
-            This way, we've increased our computation time somewhat but reduced our
-            space usage. Importantly, we can tune Δ for our computer so that we use
-            as much memory as we can so that we can speed up the rank query.
+            Fortunately, there's a way out of this conundrum. Suppose we store
+            the pre-computed ranks for only a few characters - say every Δ
+            characters in the BWT. Then, to calculate the rank of any character <code
+                >c</code
+            >, we only need to walk to <code>c</code> from the nearest
+            "checkpoint" at which we pre-computed the rank, counting other
+            <code>c</code>'s along the way. This way, we've increased our
+            computation time somewhat but reduced our space usage. Importantly,
+            we can tune Δ for our computer so that we use as much memory as we
+            can so that we can speed up the rank query.
         </p>
         <p>This is illustrated below</p>
         <RankDisplay base_string={input_string} />
+    </section>
+
+    <section>
+        <h2>Using Rank Queries for String Matching</h2>
+        <p>
+            I mentioned that we can use rank queries to walk backwards through
+            the original string. Let's try to use that idea to try and match
+            substrings of the string. Here's an interesting property - all
+            permutations of the original string of the form <code>IJK...</code>,
+            i.e. permutations starting with <code>IJK</code>, are present
+            contiguously in the Burrows-Wheeler table. Similarly, given any
+            prefix of a permutation, all substrings with that prefix are present
+            contiguously in the Burrows-Wheeler table. So, for a given prefix,
+            if we know the starting and ending indices of its occurrences, we
+            get all other occurrences for free in the Burrows-Wheeler table!
+        </p>
+        <p>
+            So let's say we know the positions of permutations beginning with
+            <code>IJK</code>. Suppose they're in indices <code>i</code> to
+            <code>j</code>. We can now calculate the positions of permutations
+            beginning with <code>LIJK</code>. Let the first <code>L</code> in
+            the BWT in the range <code>i..j</code> be <code>i'</code> and the
+            last <code>L</code> in the BWT in <code>i..j</code> be
+            <code>j'</code>. Now, the permutation at index <code>rank(i')</code>
+            is a permutation beginning with <code>LIJK</code>, and so is the
+            permutation at index <code>rank(j')</code>. But now, every
+            intermediate value in the range <code>rank(i')..rank(j')</code> is
+            also a permutation beginning with <code>LIJK</code>. And due to the
+            correspondence property, these <code>L</code>'s must lie in
+            <code>i'..j'</code>. Therefore, by looking at just the first and
+            last <code>L</code>'s in the range <code>i..j</code>, we could
+            get the entire range <code>rank(i')..rank(j')</code> for free!
+        </p>
+        <p>
+            This gives us an algorithm to find substrings in the original string.
+            Start with the indices <code>i = 0; j = len(bwt)</code> and matched
+            string <code>""</code>. Now, iteratively match the next character of
+            the substring from the end, "squeezing" the range of possible matches
+            as above. At the end, either we'll get a range of permutations in the
+            Burrows-Wheeler table that start with the full substring, or at some
+            point the squeezed range will become empty. In the former case, we've
+            found all possible positions of the substring and in the latter case,
+            we know that the substring is not in the original string.
+        </p>
+        <p>
+            Of course, we need to know the mapping between permutations in the
+            Burrows-Wheeler table and positions in the original string. But
+            we can store this information while constructing the BWT, or calculate
+            it by counting the number of traversals needed to reach <code>~</code>
+            in the BWT using rank queries. This is the importance of the final
+            <code>~</code> character. As before with rank queries, we can reduce
+            the memory needed to store this mapping by storing it at Δ milestones
+            only.
+        </p>
     </section>
 </article>
 
