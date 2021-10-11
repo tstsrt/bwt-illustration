@@ -265,7 +265,7 @@
     article {
         max-width: 60em;
         margin: 0 auto;
-        margin-bottom: 8ex;
+        padding-bottom: 8ex;
     }
 
     code {
