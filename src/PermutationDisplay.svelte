@@ -7,11 +7,13 @@
         make_permutations,
         sort_lexicographically,
         sort_by_index,
+get_bwt_from_sorted_perms,
     } from "./permutations";
     type Stages = "list_perms" | "sort_perms" | "hl_last_col";
     const all_stages: Stages[] = ["list_perms", "sort_perms", "hl_last_col"];
     let stage: Stages = "list_perms";
     let perms: Permutation[] = [];
+    let bwt: string;
 
     function set_stage(new_stage: Stages) {
         stage = new_stage;
@@ -35,10 +37,12 @@
     $: switch (stage) {
         case "list_perms":
             perms = sort_by_index(perms);
+            bwt = null;
             break;
         case "sort_perms":
         case "hl_last_col":
             perms = sort_lexicographically(perms);
+            bwt = get_bwt_from_sorted_perms(perms);
             break;
     }
 </script>
@@ -69,9 +73,8 @@
                     animate:flip={{ duration: 600 }}
                     class:hl={stage === "hl_last_col"}
                 >
-                    <span>{perm.permutation.slice(0, -1)}</span><span
-                        >{perm.permutation.at(-1)}</span
-                    >
+                    <span>{perm.permutation.slice(0, -1)}</span>&ZeroWidthSpace;
+                    <span>{perm.permutation.at(-1)}</span>
                 </li>
             {/each}
         {:else}
@@ -79,7 +82,11 @@
         {/if}
     </ul>
 
-    <p>The permutations of the input string</p>
+    {#if bwt && stage === "hl_last_col"}
+        <p>The Burrows-Wheeler Transform is <b>{bwt}</b></p>
+    {/if}
+
+    <p class="caption">The permutations of the input string</p>
 </section>
 
 <style>
@@ -160,7 +167,7 @@
         text-align: center;
     }
 
-    p::before {
+    p.caption::before {
         content: "Figure: ";
         font-weight: 700;
     }

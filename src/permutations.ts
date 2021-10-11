@@ -24,3 +24,7 @@ export function sort_lexicographically(
         return p1.permutation > p2.permutation ? 1 : -1;
     });
 }
+
+export function get_bwt_from_sorted_perms(perms: readonly Permutation[]): string {
+    return perms.map(p => p.permutation.at(-1)).join("");
+}

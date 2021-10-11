@@ -2,6 +2,7 @@
     import CorrespondenceDisplay from "./CorrespondenceDisplay.svelte";
     import InputString from "./InputString.svelte";
     import PermutationDisplay from "./PermutationDisplay.svelte";
+    import RankDisplay from "./RankDisplay.svelte";
 
     let input_string: string;
 </script>
@@ -53,9 +54,9 @@
                 characters grouped together. This is a consequence of the
                 lexicographic order - just as a dictionary is subdivided into
                 sections with words starting with 'A', 'B', 'C', etc., so too is
-                the first column. So, we can easily compute and compress the first
-                column by simply storing the counts of each unique letter in the
-                last column.
+                the first column. So, we can easily compute and compress the
+                first column by simply storing the counts of each unique letter
+                in the last column.
             </li>
         </ul>
     </section>
@@ -102,7 +103,48 @@
 
     <section>
         <h2>Rank Queries</h2>
-        <p>Now th</p>
+        <p>
+            Now, we'll see a nice application of the correspondence property.
+            Suppose we have a letter <code>c</code> at position <code>pos</code>
+            in the Burrows-Wheeler transform. We define that character's
+            <emph>rank</emph> to be the number of <code>c</code>'s come before
+            <code>pos</code> in the BWT. From the correspondence property, it is
+            equal to the position of that character <code>c</code> in the first
+            column, relative to the first <code>c</code>.
+        </p>
+        <p>
+            But why is this useful? This is because if we get the index of the
+            corresponding <code>c</code> in the first column, the last character
+            in that row is the character <code>d</code> that comes immediately
+            before <code>c</code> in the original string. So, if we can calculate
+            the rank of characters in the Burrows-Wheeler transform, we can easily
+            walk backwards through the original string.
+        </p>
+        <p>
+            So, how do we calculate the rank of any character? One way to do it
+            would be to travel all the way from the start of the string to the
+            character of interest and count the number of <code>c</code>'s along
+            the way. For very long strings, like the human genome with about 3
+            billion characters, this takes way too long. Another approach is to
+            pre-compute the rank of every character, so that every rank
+            calculation is extremely fast. But this takes too much space - an
+            unsigned integer per base pair of the human genome requires about
+            12GB of space. We're left with a conundrum - do we suffer through
+            the long computation for every rank calculation or do we suck it up
+            and spend a lot of money to buy more RAM?
+        </p>
+        <p>
+            Fortunately, there's a way out of this conundrum. Suppose we store the
+            pre-computed ranks for only a few characters - say every Δ characters in
+            the BWT. Then, to calculate the rank of any character <code>c</code>, we
+            only need to walk to <code>c</code> from the nearest "checkpoint" at which
+            we pre-computed the rank, counting other <code>c</code>'s along the way.
+            This way, we've increased our computation time somewhat but reduced our
+            space usage. Importantly, we can tune Δ for our computer so that we use
+            as much memory as we can so that we can speed up the rank query.
+        </p>
+        <p>This is illustrated below</p>
+        <RankDisplay base_string={input_string} />
     </section>
 </article>
 
@@ -116,5 +158,12 @@
     article {
         max-width: 60em;
         margin: 0 auto;
+    }
+
+    code {
+        font-size: 1.3em;
+        background-color: #f0f0f0;
+        padding: 0.1ex 0.3em;
+        border-radius: 5px;
     }
 </style>

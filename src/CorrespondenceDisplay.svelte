@@ -18,12 +18,18 @@
     ): boolean {
         return perm.permutation.at(hl_index) == test_char;
     }
-    
-    function set_random() {
-        const unique_chars = Array.from(new Set(base_string));
-        char = unique_chars[Math.floor(Math.random() * unique_chars.length)];
-    }
 
+    function set_random() {
+        let unique_chars_set = new Set(base_string);
+        unique_chars_set.delete('~');
+        const unique_chars = Array.from(unique_chars_set);
+        let new_index: number = Math.floor(Math.random() * unique_chars.length);
+        if (unique_chars[new_index] == char) {
+            char = unique_chars[(new_index + 1) % unique_chars.length];
+        } else {
+            char = unique_chars[new_index];
+        }
+    }
 
     let perms: Permutation[] = [];
 
@@ -34,34 +40,44 @@
 
 <Form>
     <button on:click={set_random}>
-        <Icon icon={dice} inline={true}/>
+        <Icon icon={dice} inline={true} />
     </button>
-    <input type="text" bind:value={char} placeholder="Enter a query character" />
+    <input
+        type="text"
+        bind:value={char}
+        placeholder="Enter a query character"
+    />
 </Form>
 
 <section>
     <div>
         <ul id="col-first">
-            {#each perms as perm, index (perm.index)}
-                <li class:highlight={should_hl(perm, 0, char)}>
-                    <span>{perm.permutation.at(0)}</span><span
-                        >{perm.permutation.slice(1)}</span
-                    >
-                </li>
-            {/each}
+            {#if base_string}
+                {#each perms as perm (perm.index)}
+                    <li class:highlight={should_hl(perm, 0, char)}>
+                        <span>{perm.permutation.at(0)}</span>&ZeroWidthSpace;
+                        <span>{perm.permutation.slice(1)}</span>
+                    </li>
+                {/each}
+            {:else}
+                <li>No string defined</li>
+            {/if}
         </ul>
         <p>First column {char || "?"} entries</p>
     </div>
 
     <div>
         <ul id="col-last">
-            {#each perms as perm, index (perm.index)}
-                <li class:highlight={should_hl(perm, -1, char)}>
-                    <span>{perm.permutation.slice(0, -1)}</span><span
-                        >{perm.permutation.at(-1)}</span
-                    >
-                </li>
-            {/each}
+            {#if base_string}
+                {#each perms as perm, index (perm.index)}
+                    <li class:highlight={should_hl(perm, -1, char)}>
+                        <span>{perm.permutation.slice(0, -1)}</span>&ZeroWidthSpace;
+                        <span>{perm.permutation.at(-1)}</span>
+                    </li>
+                {/each}
+            {:else}
+                <li>No string defined</li>
+            {/if}
         </ul>
         <p>Last column {char || "?"} entries</p>
     </div>
@@ -87,10 +103,16 @@
 
     li {
         opacity: 0.4;
+        transition: all 0.3s;
     }
 
     li.highlight {
         opacity: 1;
+    }
+
+    span {
+        font-family: monospace;
+        font-size: 1.3em;
     }
 
     #col-first li.highlight span:first-child {
