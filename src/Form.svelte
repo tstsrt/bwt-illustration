@@ -21,6 +21,7 @@
         display: inline;
         position: relative;
         width: max-content;
+        margin: 0.2ex 0.5em;
     }
 
     form::before {

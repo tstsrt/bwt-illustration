@@ -3,19 +3,39 @@
     import InputString from "./InputString.svelte";
     import PermutationDisplay from "./PermutationDisplay.svelte";
     import RankDisplay from "./RankDisplay.svelte";
+    import StringMatchDisplay from "./StringMatchDisplay.svelte";
 
     let input_string: string;
 </script>
 
 <article>
+    <header>
+        <h1>
+            The Burrows-Wheeler Transform in String Matching: An Interactive
+            Demo
+        </h1>
+        <address>
+            By <a href="mailto:ninadhuilgol@iisc.ac.in" rel="author">Ninad</a>
+        </address>
+    </header>
+
     <section>
         <h2>Introduction</h2>
-        The Burrows-Wheeler Transform is a rearrangement (permutation) of a string
-        with several interesting properties. It is widely used in text compression
-        as part of the bzip algorithm. It is also very useful in matching several
-        short substrings to a large string. This last application, the sequence alignment
-        problem, is particularly important for next-generation sequencing techniques
-        used in modern-day genetic analyses.
+        <p>
+            The Burrows-Wheeler Transform is a rearrangement (permutation) of a
+            string with several interesting properties. It is widely used in
+            text compression as part of the bzip algorithm. It is also very
+            useful in matching several short substrings to a large string. This
+            last application, the sequence alignment problem, is particularly
+            important for next-generation sequencing techniques used in
+            modern-day genetic analyses.
+        </p>
+        <p>
+            This page is my attempt to try and visualise some of the concepts and
+            constructions involved in using the Burrows-Wheeler Transform. The steps
+            shown in this article are computed interactively. Feel free to use your own
+            inputs to see how the BWT works.
+        </p>
     </section>
 
     <section>
@@ -177,29 +197,54 @@
             also a permutation beginning with <code>LIJK</code>. And due to the
             correspondence property, these <code>L</code>'s must lie in
             <code>i'..j'</code>. Therefore, by looking at just the first and
-            last <code>L</code>'s in the range <code>i..j</code>, we could
-            get the entire range <code>rank(i')..rank(j')</code> for free!
+            last <code>L</code>'s in the range <code>i..j</code>, we could get
+            the entire range <code>rank(i')..rank(j')</code> for free!
         </p>
         <p>
-            This gives us an algorithm to find substrings in the original string.
-            Start with the indices <code>i = 0; j = len(bwt)</code> and matched
-            string <code>""</code>. Now, iteratively match the next character of
-            the substring from the end, "squeezing" the range of possible matches
-            as above. At the end, either we'll get a range of permutations in the
-            Burrows-Wheeler table that start with the full substring, or at some
-            point the squeezed range will become empty. In the former case, we've
-            found all possible positions of the substring and in the latter case,
-            we know that the substring is not in the original string.
+            This gives us an algorithm to find substrings in the original
+            string. Start with the indices <code>i = 0; j = len(bwt)</code> and
+            matched string <code>""</code>. Now, iteratively match the next
+            character of the substring from the end, "squeezing" the range of
+            possible matches as above. At the end, either we'll get a range of
+            permutations in the Burrows-Wheeler table that start with the full
+            substring, or at some point the squeezed range will become empty. In
+            the former case, we've found all possible positions of the substring
+            and in the latter case, we know that the substring is not in the
+            original string.
         </p>
         <p>
             Of course, we need to know the mapping between permutations in the
-            Burrows-Wheeler table and positions in the original string. But
-            we can store this information while constructing the BWT, or calculate
-            it by counting the number of traversals needed to reach <code>~</code>
+            Burrows-Wheeler table and positions in the original string. But we
+            can store this information while constructing the BWT, or calculate
+            it by counting the number of traversals needed to reach <code
+                >~</code
+            >
             in the BWT using rank queries. This is the importance of the final
             <code>~</code> character. As before with rank queries, we can reduce
             the memory needed to store this mapping by storing it at Δ milestones
             only.
+        </p>
+        <p>This is illustrated below</p>
+        <StringMatchDisplay base_string={input_string} />
+    </section>
+
+    <section>
+        <h2>Conclusion</h2>
+        <p>
+            So what did we achieve by doing all this? First, the BWT is a very
+            compact data structure, even including the rank and backreference
+            lookup tables. So, we can use it without requiring a huge amount of
+            RAM. Also, since each string matching step depends only on the
+            characters of the query string, once we've constructed the rank and
+            backreference tables, we can search for substrings in a time
+            proportional to the length of the <emph>substring</emph>, and not
+            the whole string. So, for querying multiple short substrings, it's
+            very efficient time-wise as well.
+        </p>
+        <p>
+            This article is based largely on the lectures of
+            <a href="http://hariharan-ramesh.com">Prof Ramesh Hariharan</a> given
+            at IISc.
         </p>
     </section>
 </article>
@@ -211,9 +256,14 @@
         --hl-color: white;
     }
 
+    a {
+        color: var(--accent-color);
+    }
+
     article {
         max-width: 60em;
         margin: 0 auto;
+        margin-bottom: 8ex;
     }
 
     code {
