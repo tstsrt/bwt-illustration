@@ -16,6 +16,8 @@
         </h1>
         <address>
             By <a href="mailto:ninadhuilgol@iisc.ac.in" rel="author">Ninad</a>
+            <br/>
+            This page is open source. <a href="https://github.com/tstsrt/bwt-illustration">View the source on GitHub</a>.
         </address>
     </header>
 
