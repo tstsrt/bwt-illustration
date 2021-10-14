@@ -78,7 +78,7 @@
 
 <label for="next-char">Next character to match: </label>
 <Form>
-    <input type="text" bind:value={next_char} name="next-char" />
+    <input type="text" bind:value={next_char} name="next-char" aria-label="Next Character" />
 </Form>
 
 <Form>

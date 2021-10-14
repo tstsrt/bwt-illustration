@@ -26,7 +26,7 @@
 </script>
 
 <Form {send_data}>
-    <button name="random" type="button" on:click={gen_random}>
+    <button name="random" type="button" on:click={gen_random} aria-label="Generate Random String">
         <Icon icon={dice} inline={true} />
     </button>
     <input

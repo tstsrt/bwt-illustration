@@ -39,7 +39,7 @@
 </script>
 
 <Form>
-    <button on:click={set_random}>
+    <button on:click={set_random} aria-label="Generate Random Query Character">
         <Icon icon={dice} inline={true} />
     </button>
     <input

@@ -7,7 +7,7 @@
         make_permutations,
         sort_lexicographically,
         sort_by_index,
-get_bwt_from_sorted_perms,
+        get_bwt_from_sorted_perms,
     } from "./permutations";
     type Stages = "list_perms" | "sort_perms" | "hl_last_col";
     const all_stages: Stages[] = ["list_perms", "sort_perms", "hl_last_col"];
@@ -65,7 +65,7 @@ get_bwt_from_sorted_perms,
             </li>
         {/each}
     </ul>
-    
+
     <ul id="perms-list">
         {#if base_string}
             {#each perms as perm (perm.index)}

@@ -12,7 +12,7 @@
 >
     <slot />
     {#if send_data}
-        <button type="submit"><Icon icon={right_arrow} inline={true} /></button>
+        <button type="submit" aria-label="Accept"><Icon icon={right_arrow} inline={true} /></button>
     {/if}
 </form>
 

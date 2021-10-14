@@ -1,7 +1,6 @@
 <script lang="ts">
     export let base_string: string;
 
-    import Form from "./Form.svelte";
     import {
         Permutation,
         sort_lexicographically,
