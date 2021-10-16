@@ -18,7 +18,7 @@
 
 <style>
     form {
-        display: inline;
+        display: inline-block;
         position: relative;
         width: max-content;
         margin: 0.2ex 0.5em;

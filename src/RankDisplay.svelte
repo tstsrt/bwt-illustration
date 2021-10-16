@@ -7,25 +7,31 @@
         make_permutations,
         get_bwt_from_sorted_perms,
     } from "./permutations";
+    import Form from "./Form.svelte";
+    import Icon from "@iconify/svelte";
+    import dice from "@iconify/icons-gg/dice-5";
 
     type rank_strategy = "store-none" | "store-all" | "store-some";
 
     let perms: Permutation[] = [];
     let bwt: string;
+    let user_rank_char: string = "~";
     let ranks: number[] = [];
     let strat: rank_strategy = "store-all";
     let delta: number = 2;
 
-    function calc_ranks(bwt: string): number[] {
-        let letters: Map<string, number> = new Map();
+    function calc_ranks(bwt: string, rank_char: string): number[] {
         let ranks: number[] = [];
         for (let char of bwt) {
-            letters.set(char, 0);
-        }
-        for (let char of bwt) {
-            const next_rank = letters.get(char);
-            ranks.push(next_rank);
-            letters.set(char, next_rank + 1);
+            let next_rank = ranks.at(-1);
+            if (next_rank === undefined) {
+                next_rank = -1;
+            }
+            if (char === rank_char) {
+                ranks.push(next_rank + 1);
+            } else {
+                ranks.push(next_rank);
+            }
         }
         return ranks;
     }
@@ -64,13 +70,93 @@
         }
     }
 
+    function set_random() {
+        let unique_chars_set = new Set(base_string);
+        unique_chars_set.delete("~");
+        const unique_chars = Array.from(unique_chars_set);
+        let new_index: number = Math.floor(Math.random() * unique_chars.length);
+        if (unique_chars[new_index] === user_rank_char) {
+            user_rank_char =
+                unique_chars[(new_index + 1) % unique_chars.length];
+        } else {
+            user_rank_char = unique_chars[new_index];
+        }
+    }
+
     $: if (base_string) {
         perms = sort_lexicographically(make_permutations(base_string));
         bwt = get_bwt_from_sorted_perms(perms);
-        ranks = calc_ranks(bwt);
+        ranks = calc_ranks(bwt, user_rank_char);
     }
 </script>
 
+<ul id="strats">
+        <li>
+            <label for="rank-char">Character to compute ranks for</label>
+            <Form>
+                <button
+                    name="random"
+                    type="button"
+                    on:click={set_random}
+                    aria-label="Generate Random Ranking Character"
+                >
+                    <Icon icon={dice} inline={true} />
+                </button>
+                <input
+                    type="text"
+                    name="rank-char"
+                    bind:value={user_rank_char}
+                    required
+                />
+            </Form>
+        </li>
+        <li>
+            <input
+                type="radio"
+                name="strategies"
+                bind:group={strat}
+                value="store-none"
+                id="strategy-store-none"
+                disabled={base_string === undefined}
+            />
+            <label for="strategy-store-none">Store None</label>
+        </li>
+        <li>
+            <input
+                type="radio"
+                name="strategies"
+                bind:group={strat}
+                value="store-all"
+                id="strategy-store-all"
+                disabled={base_string === undefined}
+            />
+            <label for="strategy-store-all">Store All</label>
+        </li>
+        <li>
+            <input
+                type="radio"
+                name="strategies"
+                bind:group={strat}
+                value="store-some"
+                id="strategy-store-some"
+                disabled={base_string === undefined}
+            />
+            <label for="strategy-store-some">Store Some</label>
+            <label for="delta"
+                >Δ:
+                <input
+                    type="number"
+                    min="1"
+                    max={(bwt && bwt.length) || 1}
+                    bind:value={delta}
+                    disabled={base_string === undefined ||
+                        strat !== "store-some"}
+                    name="delta"
+                />
+            </label>
+        </li>
+        <li class="dummy" />
+    </ul>
 <div>
     <ul id="perms">
         {#if base_string !== undefined}
@@ -113,54 +199,6 @@
         {/if}
         <li>Array Traversals needed to calculate rank</li>
     </ul>
-
-    <ul id="strats">
-        <li>
-            <input
-                type="radio"
-                name="strategies"
-                bind:group={strat}
-                value="store-none"
-                id="strategy-store-none"
-                disabled={base_string === undefined}
-            />
-            <label for="strategy-store-none">Store None</label>
-        </li>
-        <li>
-            <input
-                type="radio"
-                name="strategies"
-                bind:group={strat}
-                value="store-all"
-                id="strategy-store-all"
-                disabled={base_string === undefined}
-            />
-            <label for="strategy-store-all">Store All</label>
-        </li>
-        <li>
-            <input
-                type="radio"
-                name="strategies"
-                bind:group={strat}
-                value="store-some"
-                id="strategy-store-some"
-                disabled={base_string === undefined}
-            />
-            <label for="strategy-store-some">Store Some</label>
-            <label for="delta"
-                >Δ:
-                <input
-                    type="number"
-                    min="1"
-                    max={(bwt && bwt.length) || 1}
-                    bind:value={delta}
-                    disabled={base_string === undefined || strat !== "store-some"}
-                    name="delta"
-                />
-            </label>
-        </li>
-        <li class="dummy" />
-    </ul>
 </div>
 
 <style>
@@ -181,6 +219,11 @@
         text-align: center;
     }
 
+    #strats {
+        display: flex;
+        flex-flow: row wrap;
+    }
+
     #strats > li {
         text-align: start;
         margin: 1ex auto;
@@ -196,6 +239,18 @@
 
     span.hidden {
         visibility: hidden;
+    }
+
+    button {
+        background-color: #fff0;
+        border: none;
+        outline: none;
+    }
+
+    input[type="text"] {
+        border: none;
+        outline: none;
+        max-width: 2em;
     }
 
     input[type="radio"] {
@@ -223,6 +278,10 @@
         background-color: #fff0;
     }
 
+    label[for="rank-char"] {
+        hyphens: auto;
+    }
+
     label[for="delta"] {
         max-width: max-content;
         position: relative;
@@ -236,9 +295,9 @@
         height: 1px;
         bottom: -2px;
         left: 0;
-        background-color: black;        
+        background-color: black;
     }
-    
+
     label[for="delta"]::after {
         content: "";
         display: block;
