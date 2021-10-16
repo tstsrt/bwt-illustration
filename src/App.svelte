@@ -16,8 +16,11 @@
         </h1>
         <address>
             By <a href="mailto:ninadhuilgol@iisc.ac.in" rel="author">Ninad</a>
-            <br/>
-            This page is open source. <a href="https://github.com/tstsrt/bwt-illustration">View the source on GitHub</a>.
+            <br />
+            This page is open source.
+            <a href="https://github.com/tstsrt/bwt-illustration"
+                >View the source on GitHub</a
+            >.
         </address>
     </header>
 
@@ -33,10 +36,10 @@
             modern-day genetic analyses.
         </p>
         <p>
-            This page is my attempt to try and visualise some of the concepts and
-            constructions involved in using the Burrows-Wheeler Transform. The steps
-            shown in this article are computed interactively. Feel free to use your own
-            inputs to see how the BWT works.
+            This page is my attempt to try and visualise some of the concepts
+            and constructions involved in using the Burrows-Wheeler Transform.
+            The steps shown in this article are computed interactively. Feel
+            free to use your own inputs to see how the BWT works.
         </p>
     </section>
 
@@ -158,11 +161,10 @@
         <p>
             Fortunately, there's a way out of this conundrum. Suppose we store
             the pre-computed ranks for only a few characters - say every Δ
-            characters in the BWT. Then, to calculate the rank of any character <code
-                >c</code
-            >, we only need to walk to <code>c</code> from the nearest
-            "checkpoint" at which we pre-computed the rank, counting other
-            <code>c</code>'s along the way. This way, we've increased our
+            characters in the BWT. Then, to calculate the rank of any character
+            <code>c</code>, we only need to walk to <code>c</code> from the
+            nearest "checkpoint" at which we pre-computed the rank, counting
+            other <code>c</code>'s along the way. This way, we've increased our
             computation time somewhat but reduced our space usage. Importantly,
             we can tune Δ for our computer so that we use as much memory as we
             can so that we can speed up the rank query.
@@ -248,6 +250,25 @@
             <a href="http://hariharan-ramesh.com">Prof Ramesh Hariharan</a> given
             at IISc.
         </p>
+    </section>
+
+    <section>
+        <h2>Further Reading</h2>
+        <ul>
+            <li>
+                Burrows' and Wheeler's <a
+                    href="https://www.hpl.hp.com/techreports/Compaq-DEC/SRC-RR-124.pdf"
+                    >original paper</a
+                > where they describe the BWT
+            </li>
+            <li>
+                The paper by P. Ferragina and G. Manzini describing the use of
+                the BWT in string matching <a
+                    href="https://doi.org/10.1109/SFCS.2000.892127"
+                    >DOI: 10.1109/SFCS.2000.892127</a
+                >
+            </li>
+        </ul>
     </section>
 </article>
 
