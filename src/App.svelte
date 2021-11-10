@@ -75,13 +75,14 @@
                 position in the BWT.
             </li>
             <li>
-                The first column of the sorted list of permutation has all its
-                characters grouped together. This is a consequence of the
-                lexicographic order - just as a dictionary is subdivided into
-                sections with words starting with 'A', 'B', 'C', etc., so too is
-                the first column. So, we can easily compute and compress the
-                first column by simply storing the counts of each unique letter
-                in the last column.
+                The first column of the sorted list of permutations (the
+                "Burrows-Wheeler table") has all its characters grouped
+                together. This is a consequence of the lexicographic order -
+                just as a dictionary is subdivided into sections with words
+                starting with 'A', 'B', 'C', etc., so too is the first column.
+                So, we can easily compute and compress the first column by
+                simply storing the counts of each unique letter in the last
+                column.
             </li>
         </ul>
     </section>
@@ -194,15 +195,18 @@
             beginning with <code>LIJK</code>. Let the first <code>L</code> in
             the BWT in the range <code>i..j</code> be <code>i'</code> and the
             last <code>L</code> in the BWT in <code>i..j</code> be
-            <code>j'</code>. Now, the permutation at index <code>rank(i')</code>
-            is a permutation beginning with <code>LIJK</code>, and so is the
-            permutation at index <code>rank(j')</code>. But now, every
-            intermediate value in the range <code>rank(i')..rank(j')</code> is
-            also a permutation beginning with <code>LIJK</code>. And due to the
-            correspondence property, these <code>L</code>'s must lie in
-            <code>i'..j'</code>. Therefore, by looking at just the first and
-            last <code>L</code>'s in the range <code>i..j</code>, we could get
-            the entire range <code>rank(i')..rank(j')</code> for free!
+            <code>j'</code>. With rank queries, we can implement a
+            <code>last_to_first</code> function that maps a character's index in
+            the BWT to its index in the first column. Now, the permutation at
+            index <code>last_to_first(i')</code> is a permutation beginning with
+            <code>LIJK</code>, and so is the permutation at index
+            <code>rank(j')</code>. But now, every intermediate value in the
+            range <code>rank(i')..rank(j')</code> is also a permutation
+            beginning with <code>LIJK</code>. And due to the correspondence
+            property, these <code>L</code>'s must lie in <code>i'..j'</code>.
+            Therefore, by looking at just the first and last <code>L</code>'s in
+            the range <code>i..j</code>, we could get the entire range
+            <code>last_to_first(i')..last_to_first(j')</code> for free!
         </p>
         <p>
             This gives us an algorithm to find substrings in the original
