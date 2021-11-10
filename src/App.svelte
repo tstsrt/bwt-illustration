@@ -200,12 +200,13 @@
             the BWT to its index in the first column. Now, the permutation at
             index <code>last_to_first(i')</code> is a permutation beginning with
             <code>LIJK</code>, and so is the permutation at index
-            <code>rank(j')</code>. But now, every intermediate value in the
-            range <code>rank(i')..rank(j')</code> is also a permutation
-            beginning with <code>LIJK</code>. And due to the correspondence
-            property, these <code>L</code>'s must lie in <code>i'..j'</code>.
-            Therefore, by looking at just the first and last <code>L</code>'s in
-            the range <code>i..j</code>, we could get the entire range
+            <code>last_to_first(j')</code>. But now, every intermediate value in
+            the range <code>last_to_first(i')..last_to_first(j')</code> is also
+            a permutation beginning with <code>LIJK</code>. And due to the
+            correspondence property, these <code>L</code>'s must lie in
+            <code>i'..j'</code>. Therefore, by looking at just the first and
+            last <code>L</code>'s in the range <code>i..j</code>, we could get
+            the entire range
             <code>last_to_first(i')..last_to_first(j')</code> for free!
         </p>
         <p>
